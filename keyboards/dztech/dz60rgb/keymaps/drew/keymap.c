@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include <print.h>
 #define _LAYER0 0
 #define _LAYER1 1
 #define _LAYER2 2
@@ -17,19 +18,37 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[8] = LAYOUT(KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO)
 };
 
+uint8_t max = 0;
+uint8_t color_map[5][14];
+int     count = -1;
+int     pos   = -1;
+
 void rgb_matrix_indicators_user(void) {
     uint8_t this_led = host_keyboard_leds();
+    count++;
     if (!g_suspend_state) {
         switch (biton32(layer_state)) {
 			case _LAYER0:
-                rgb_matrix_set_color_all( 0x88, 0xff, 0xbb);
-                // for (int i = 0; i < 13; i++) {
-                //     rgb_matrix_set_color(i, 0x11, 0x33, 0x33);
+                // for (int a = 0; a < 5; a++){
+                //     for (int b = 0; b < 14; b++) {
+                //         float level = color_map[a][14 - b];
+                //         level       = level / max;
+                //         level       = level * 255;
+                //         rgb_matrix_set_color(a	* 14 + 	b, level * .8 , level, level * .9);
+                //     }
                 // }
-                // for (int i = 14; i < 26; i++) {
-                //     //rgb_matrix_set_color(i, 0x00, 0x00,);
-                // }
-                break;
+
+					// if(count > 5000) {
+                    //     pos++;
+                    //     count = 0;
+                    //     uprintf("%d\n", pos);
+                    // }
+                    rgb_matrix_set_color_all(0x88, 0xff, 0xff);
+                    //rgb_matrix_set_color(pos, 0x88, 0xff, 0xff);
+
+                    // rgb_matrix_set_color_all(0x66, 0xff, 0xcc);
+                    // rgb_matrix_set_color(0, 0xFF, 0x00, 0x00);
+                    break;
             case _LAYER2:
                 rgb_matrix_set_color_all(0xFF, 0x00, 0x00);
                 break;
@@ -121,4 +140,15 @@ void matrix_scan_user(void) {
     // user matrix
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) { return true; }
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    int     col   = record->event.key.col;
+    int     row   = record->event.key.row;
+    pos           = row * 14 + (14 - col);
+    // uint8_t level = color_map[row][col];
+    // level++;
+    // if (level > max) {
+    //     max = level;
+    // }
+    // color_map[row][col] = level;
+    return true;
+}
